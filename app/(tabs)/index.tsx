@@ -1,12 +1,17 @@
 import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { Platform, StyleSheet, Pressable } from 'react-native';
+import { router } from 'expo-router';
 
 import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { IconSymbol } from '@/components/ui/IconSymbol';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function HomeScreen() {
+  const { user } = useAuth();
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
@@ -17,7 +22,7 @@ export default function HomeScreen() {
         />
       }>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
+        <ThemedText type="title">Welcome, {user?.first_name || user?.username}!</ThemedText>
         <HelloWave />
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
@@ -42,7 +47,40 @@ export default function HomeScreen() {
         </ThemedText>
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
+        <ThemedText type="subtitle">Step 3: Try Navigation</ThemedText>
+        <ThemedText>
+          This app now includes routing examples. Try the buttons below to navigate between screens.
+        </ThemedText>
+        
+        <ThemedView style={styles.navigationButtons}>
+          <Pressable 
+            style={styles.navButton}
+            onPress={() => router.push('/dashboard')}
+          >
+            <IconSymbol name="gamecontroller.fill" size={20} color="white" />
+            <ThemedText style={styles.navButtonText}>Dashboard</ThemedText>
+          </Pressable>
+
+          <Pressable 
+            style={styles.navButton}
+            onPress={() => router.push('/profile')}
+          >
+            <IconSymbol name="person" size={20} color="white" />
+            <ThemedText style={styles.navButtonText}>Profile</ThemedText>
+          </Pressable>
+
+          <Pressable 
+            style={styles.navButton}
+            onPress={() => router.push('/settings')}
+          >
+            <IconSymbol name="gear" size={20} color="white" />
+            <ThemedText style={styles.navButtonText}>Settings</ThemedText>
+          </Pressable>
+        </ThemedView>
+      </ThemedView>
+
+      <ThemedView style={styles.stepContainer}>
+        <ThemedText type="subtitle">Step 4: Get a fresh start</ThemedText>
         <ThemedText>
           {`When you're ready, run `}
           <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
@@ -71,5 +109,23 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     position: 'absolute',
+  },
+  navigationButtons: {
+    marginTop: 15,
+    gap: 10,
+  },
+  navButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 15,
+    backgroundColor: '#007AFF',
+    borderRadius: 10,
+    gap: 10,
+  },
+  navButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

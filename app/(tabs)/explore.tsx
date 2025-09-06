@@ -1,5 +1,6 @@
 import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { Platform, StyleSheet, Pressable } from 'react-native';
+import { router } from 'expo-router';
 
 import { Collapsible } from '@/components/Collapsible';
 import { ExternalLink } from '@/components/ExternalLink';
@@ -24,6 +25,35 @@ export default function TabTwoScreen() {
         <ThemedText type="title">Explore</ThemedText>
       </ThemedView>
       <ThemedText>This app includes example code to help you get started.</ThemedText>
+      
+      <ThemedView style={styles.navigationSection}>
+        <ThemedText type="subtitle">Try Navigation</ThemedText>
+        <ThemedView style={styles.navButtons}>
+          <Pressable 
+            style={styles.navButton}
+            onPress={() => router.push('/profile')}
+          >
+            <IconSymbol name="person" size={20} color="white" />
+            <ThemedText style={styles.navButtonText}>Profile</ThemedText>
+          </Pressable>
+
+          <Pressable 
+            style={styles.navButton}
+            onPress={() => router.push('/settings')}
+          >
+            <IconSymbol name="gear" size={20} color="white" />
+            <ThemedText style={styles.navButtonText}>Settings</ThemedText>
+          </Pressable>
+
+          <Pressable 
+            style={styles.navButton}
+            onPress={() => router.push('/modal')}
+          >
+            <IconSymbol name="square.and.arrow.up" size={20} color="white" />
+            <ThemedText style={styles.navButtonText}>Modal</ThemedText>
+          </Pressable>
+        </ThemedView>
+      </ThemedView>
       <Collapsible title="File-based routing">
         <ThemedText>
           This app has two screens:{' '}
@@ -106,5 +136,29 @@ const styles = StyleSheet.create({
   titleContainer: {
     flexDirection: 'row',
     gap: 8,
+  },
+  navigationSection: {
+    marginVertical: 20,
+  },
+  navButtons: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginTop: 10,
+  },
+  navButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    backgroundColor: '#007AFF',
+    borderRadius: 8,
+    gap: 8,
+    minWidth: 100,
+    justifyContent: 'center',
+  },
+  navButtonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
