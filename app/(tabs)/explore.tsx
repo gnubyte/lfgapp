@@ -1,164 +1,204 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet, Pressable } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { StyleSheet, View, TouchableOpacity, Alert } from 'react-native';
 import { router } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Collapsible } from '@/components/Collapsible';
-import { ExternalLink } from '@/components/ExternalLink';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import { ChatRoomList } from '@/components/ChatRoomList';
+import { MessageList, MessageListRef } from '@/components/MessageList';
+import { MessageInput } from '@/components/MessageInput';
+import { NewChatModal } from '@/components/NewChatModal';
+import { ChatRoom, Message } from '@/services/api';
 
-export default function TabTwoScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Explore</ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      
-      <ThemedView style={styles.navigationSection}>
-        <ThemedText type="subtitle">Try Navigation</ThemedText>
-        <ThemedView style={styles.navButtons}>
-          <Pressable 
-            style={styles.navButton}
-            onPress={() => router.push('/profile')}
-          >
-            <IconSymbol name="person" size={20} color="white" />
-            <ThemedText style={styles.navButtonText}>Profile</ThemedText>
-          </Pressable>
+export default function MessagesScreen() {
+  // Use safe area insets with fallback - handle the hook error
+  let insets = { top: 0, bottom: 0, left: 0, right: 0 };
+  try {
+    insets = useSafeAreaInsets();
+  } catch (error) {
+    console.warn('useSafeAreaInsets hook error:', error);
+    // Use default insets
+  }
+  const [selectedChatRoom, setSelectedChatRoom] = useState<ChatRoom | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [showNewChatModal, setShowNewChatModal] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const messageListRef = useRef<MessageListRef>(null);
 
-          <Pressable 
-            style={styles.navButton}
-            onPress={() => router.push('/settings')}
-          >
-            <IconSymbol name="gear" size={20} color="white" />
-            <ThemedText style={styles.navButtonText}>Settings</ThemedText>
-          </Pressable>
+  const handleChatRoomSelect = (chatRoom: ChatRoom) => {
+    console.log('🏠 Chat room selected:', chatRoom.id, 'name:', chatRoom.name, 'participants:', chatRoom.participants.length);
+    setSelectedChatRoom(chatRoom);
+    setMessages([]); // Clear messages when switching chat rooms
+  };
 
-          <Pressable 
-            style={styles.navButton}
-            onPress={() => router.push('/modal')}
+  const handleBackToInbox = () => {
+    setSelectedChatRoom(null);
+    setMessages([]);
+  };
+
+  const handleMessageSent = (message: Message) => {
+    console.log('📨 Message sent, adding to list:', message);
+    setMessages(prev => [...prev, message]);
+    // Also add to MessageList via ref
+    messageListRef.current?.addMessage(message);
+  };
+
+  const handleMessagesLoaded = (loadedMessages: Message[]) => {
+    console.log('📨 Messages loaded in parent:', loadedMessages.length, 'messages');
+    setMessages(loadedMessages);
+  };
+
+  const handleChatCreated = (newChatRoom: ChatRoom) => {
+    // Navigate to the new chat room
+    setSelectedChatRoom(newChatRoom);
+    setMessages([]);
+    setShowNewChatModal(false);
+    // Trigger refresh of chat room list
+    setRefreshTrigger(prev => prev + 1);
+  };
+
+  if (selectedChatRoom) {
+    return (
+      <ThemedView style={styles.container}>
+        {/* Chat Header */}
+        <View style={[styles.chatHeader, { paddingTop: insets.top + 12 }]}>
+          <TouchableOpacity 
+            style={styles.backButton}
+            onPress={handleBackToInbox}
+            activeOpacity={0.7}
           >
-            <IconSymbol name="square.and.arrow.up" size={20} color="white" />
-            <ThemedText style={styles.navButtonText}>Modal</ThemedText>
-          </Pressable>
-        </ThemedView>
-      </ThemedView>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image source={require('@/assets/images/react-logo.png')} style={{ alignSelf: 'center' }} />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Custom fonts">
-        <ThemedText>
-          Open <ThemedText type="defaultSemiBold">app/_layout.tsx</ThemedText> to see how to load{' '}
-          <ThemedText style={{ fontFamily: 'SpaceMono' }}>
-            custom fonts such as this one.
-          </ThemedText>
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/versions/latest/sdk/font">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful <ThemedText type="defaultSemiBold">react-native-reanimated</ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
+            <IconSymbol name="chevron.left" size={24} color="#007AFF" />
+          </TouchableOpacity>
+          
+          <View style={styles.chatHeaderInfo}>
+            <ThemedText style={styles.chatTitle}>
+              {selectedChatRoom.name || 'Chat'}
             </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
+            <ThemedText style={styles.chatSubtitle}>
+              {selectedChatRoom.participants.length} participant{selectedChatRoom.participants.length !== 1 ? 's' : ''}
+            </ThemedText>
+          </View>
+          
+          <TouchableOpacity 
+            style={styles.moreButton}
+            onPress={() => Alert.alert('More Options', 'Chat options coming soon')}
+            activeOpacity={0.7}
+          >
+            <IconSymbol name="ellipsis" size={24} color="#8E8E93" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Messages */}
+        <MessageList 
+          ref={messageListRef}
+          chatRoom={selectedChatRoom} 
+          onMessagesLoaded={handleMessagesLoaded}
+        />
+
+        {/* Message Input */}
+        <MessageInput 
+          chatRoomId={selectedChatRoom.id}
+          onMessageSent={handleMessageSent}
+        />
+      </ThemedView>
+    );
+  }
+
+  return (
+    <ThemedView style={styles.container}>
+      {/* Inbox Header */}
+      <View style={[styles.inboxHeader, { paddingTop: insets.top + 12 }]}>
+        <ThemedText type="title" style={styles.inboxTitle}>Messages</ThemedText>
+        <TouchableOpacity 
+          style={styles.newChatButton}
+          onPress={() => setShowNewChatModal(true)}
+          activeOpacity={0.7}
+        >
+          <IconSymbol name="plus" size={24} color="#007AFF" />
+        </TouchableOpacity>
+      </View>
+
+      {/* Chat Room List */}
+      <ChatRoomList 
+        onChatRoomSelect={handleChatRoomSelect}
+        refreshTrigger={refreshTrigger}
+      />
+      
+      {/* New Chat Modal */}
+      <NewChatModal
+        visible={showNewChatModal}
+        onClose={() => setShowNewChatModal(false)}
+        onChatCreated={handleChatCreated}
+      />
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+  container: {
+    flex: 1,
+    backgroundColor: 'transparent',
   },
-  titleContainer: {
+  inboxHeader: {
     flexDirection: 'row',
-    gap: 8,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingBottom: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#E5E5EA',
   },
-  navigationSection: {
-    marginVertical: 20,
+  inboxTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
   },
-  navButtons: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-    marginTop: 10,
+  newChatButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F2F2F7',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  navButton: {
+  chatHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
-    backgroundColor: '#007AFF',
-    borderRadius: 8,
-    gap: 8,
-    minWidth: 100,
-    justifyContent: 'center',
+    paddingHorizontal: 16,
+    paddingBottom: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#E5E5EA',
+    backgroundColor: 'transparent',
   },
-  navButtonText: {
-    color: 'white',
-    fontSize: 14,
+  backButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F2F2F7',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  chatHeaderInfo: {
+    flex: 1,
+  },
+  chatTitle: {
+    fontSize: 18,
     fontWeight: '600',
+    marginBottom: 2,
+  },
+  chatSubtitle: {
+    fontSize: 14,
+    color: '#8E8E93',
+  },
+  moreButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F2F2F7',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 12,
   },
 });

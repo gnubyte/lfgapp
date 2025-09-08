@@ -46,6 +46,15 @@ interface RefreshResponse {
   access_token: string;
 }
 
+export interface User {
+  id: number;
+  username: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  full_name?: string;
+}
+
 export interface TimelinePost {
   id: number;
   type: 'group_post' | 'user_post' | 'event_created' | 'event_updated' | 'event_deleted';
@@ -72,6 +81,33 @@ export interface TimelinePost {
   likes_count?: number;
   comments_count?: number;
   is_liked?: boolean;
+}
+
+// Chat and Message interfaces based on swagger documentation
+export interface ChatRoom {
+  id: number;
+  name?: string;
+  created_at: string;
+  participants: User[];
+  group_id?: number; // null for individual chats, has value for group chats
+}
+
+export interface Message {
+  id: number;
+  chat_room_id: number;
+  sender_id: number;
+  sender_name: string;
+  content: string;
+  timestamp: string;
+}
+
+export interface CreateMessage {
+  content: string;
+}
+
+export interface CreateChatRoom {
+  name?: string;
+  participant_ids: number[];
 }
 
 interface TimelineResponse {
@@ -354,6 +390,154 @@ class ApiService {
       return response.data;
     } catch (error: any) {
       console.error('❌ Timeline API error:', error);
+      if (error.response) {
+        console.error('❌ Response status:', error.response.status);
+        console.error('❌ Response data:', error.response.data);
+      }
+      throw error;
+    }
+  }
+
+  // Chat and Message API methods
+  async getChatRooms(): Promise<ChatRoom[]> {
+    try {
+      console.log('🌐 Making getChatRooms API request');
+      const response = await this.api.get('/chats');
+      console.log('🌐 Chat rooms API response:', response.status, response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ Chat rooms API error:', error);
+      if (error.response) {
+        console.error('❌ Response status:', error.response.status);
+        console.error('❌ Response data:', error.response.data);
+      }
+      throw error;
+    }
+  }
+
+  async getChatRoom(chatRoomId: number): Promise<ChatRoom> {
+    try {
+      console.log('🌐 Making getChatRoom API request for ID:', chatRoomId);
+      const response = await this.api.get(`/chats/${chatRoomId}`);
+      console.log('🌐 Chat room API response:', response.status, response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ Chat room API error:', error);
+      if (error.response) {
+        console.error('❌ Response status:', error.response.status);
+        console.error('❌ Response data:', error.response.data);
+      }
+      throw error;
+    }
+  }
+
+  async createChatRoom(chatRoomData: CreateChatRoom): Promise<ChatRoom> {
+    try {
+      console.log('🌐 Making createChatRoom API request:', chatRoomData);
+      const response = await this.api.post('/chats', chatRoomData);
+      console.log('🌐 Create chat room API response:', response.status, response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ Create chat room API error:', error);
+      if (error.response) {
+        console.error('❌ Response status:', error.response.status);
+        console.error('❌ Response data:', error.response.data);
+      }
+      throw error;
+    }
+  }
+
+  async getMessages(chatRoomId: number): Promise<Message[]> {
+    try {
+      console.log('🌐 Making getMessages API request for chat room:', chatRoomId);
+      console.log('🌐 Chat room ID type:', typeof chatRoomId);
+      console.log('🌐 API base URL:', this.api.defaults.baseURL);
+      console.log('🌐 Full URL:', `${this.api.defaults.baseURL}/messages/chat/${chatRoomId}`);
+      console.log('🌐 Auth token present:', !!this.tokens?.access_token);
+      console.log('🌐 Auth token:', this.tokens?.access_token ? this.tokens.access_token.substring(0, 20) + '...' : 'none');
+      console.log('🌐 Request headers:', this.api.defaults.headers);
+      
+      const response = await this.api.get(`/messages/chat/${chatRoomId}`);
+      console.log('🌐 Messages API response:', response.status, response.data);
+      console.log('🌐 Response data type:', typeof response.data, 'is array:', Array.isArray(response.data));
+      
+      // Handle case where API returns a single object instead of array
+      let messages = response.data;
+      if (!Array.isArray(messages)) {
+        console.log('⚠️ API returned non-array response, checking content...');
+        // Check if it's a valid message object (has required fields)
+        if (messages && typeof messages === 'object' && messages.id && messages.content) {
+          console.log('✅ Single message object detected, wrapping in array');
+          messages = [messages];
+        } else if (messages && typeof messages === 'object' && messages.id === null && messages.content === null) {
+          console.log('✅ Empty response object detected (no messages), returning empty array');
+          messages = [];
+        } else {
+          console.log('⚠️ Unexpected response format, returning empty array');
+          messages = [];
+        }
+      }
+      
+      console.log('🌐 Final messages array:', messages);
+      return messages;
+    } catch (error: any) {
+      console.error('❌ Messages API error:', error);
+      if (error.response) {
+        console.error('❌ Response status:', error.response.status);
+        console.error('❌ Response data:', error.response.data);
+        console.error('❌ Response headers:', error.response.headers);
+      } else if (error.request) {
+        console.error('❌ No response received:', error.request);
+      } else {
+        console.error('❌ Error setting up request:', error.message);
+      }
+      throw error;
+    }
+  }
+
+  async sendMessage(chatRoomId: number, messageData: CreateMessage): Promise<Message> {
+    try {
+      console.log('🌐 Making sendMessage API request for chat room:', chatRoomId, 'message:', messageData);
+      const response = await this.api.post(`/messages/chat/${chatRoomId}`, messageData);
+      console.log('🌐 Send message API response:', response.status, response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ Send message API error:', error);
+      if (error.response) {
+        console.error('❌ Response status:', error.response.status);
+        console.error('❌ Response data:', error.response.data);
+      }
+      throw error;
+    }
+  }
+
+  // User search and friends API methods
+  async searchUsers(query: string): Promise<User[]> {
+    try {
+      console.log('🌐 Making searchUsers API request with query:', query);
+      const response = await this.api.get('/users/search', {
+        params: { q: query }
+      });
+      console.log('🌐 Search users API response:', response.status, response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ Search users API error:', error);
+      if (error.response) {
+        console.error('❌ Response status:', error.response.status);
+        console.error('❌ Response data:', error.response.data);
+      }
+      throw error;
+    }
+  }
+
+  async getFriends(): Promise<User[]> {
+    try {
+      console.log('🌐 Making getFriends API request');
+      const response = await this.api.get('/friends/');
+      console.log('🌐 Get friends API response:', response.status, response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ Get friends API error:', error);
       if (error.response) {
         console.error('❌ Response status:', error.response.status);
         console.error('❌ Response data:', error.response.data);

@@ -227,16 +227,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
         
         // Validate response data
-        if (!access_token || !refresh_token || !userData) {
-          console.log('❌ Invalid login response data');
+        if (!access_token || !refresh_token) {
+          console.log('❌ Invalid login response data - missing tokens');
           return false;
+        }
+        
+        // Handle case where user data is missing or invalid
+        let finalUserData = userData;
+        if (!userData || (typeof userData === 'string' && userData === 'none') || typeof userData !== 'object') {
+          console.log('⚠️ User data missing from login response, fetching separately...');
+          try {
+            // Set tokens first so we can make authenticated requests
+            await AsyncStorage.setItem(TOKEN_KEY, JSON.stringify({ access_token, refresh_token }));
+            apiService.setTokens({ access_token, refresh_token });
+            
+            // Fetch user data
+            finalUserData = await apiService.getCurrentUser();
+            console.log('✅ User data fetched separately:', finalUserData);
+          } catch (error) {
+            console.error('❌ Failed to fetch user data:', error);
+            return false;
+          }
         }
         
         // Store tokens and user data
         try {
           await Promise.all([
             AsyncStorage.setItem(TOKEN_KEY, JSON.stringify({ access_token, refresh_token })),
-            AsyncStorage.setItem(USER_KEY, JSON.stringify(userData))
+            AsyncStorage.setItem(USER_KEY, JSON.stringify(finalUserData))
           ]);
           console.log('✅ Tokens and user data stored successfully');
         } catch (storageError) {
@@ -248,7 +266,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         apiService.setTokens({ access_token, refresh_token });
         console.log('🔑 Tokens set in API service');
         
-        setUser(userData);
+        setUser(finalUserData);
         setIsAuthenticated(true);
         console.log('✅ User authenticated, navigating to tabs');
         router.replace('/(tabs)');
