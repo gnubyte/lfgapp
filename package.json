@@ -4,11 +4,21 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
+    "proxy": "node proxy-server.js",
+    "dev": "concurrently \"npm run proxy\" \"npm start\"",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "clean": "expo r -c && rm -rf node_modules && npm install",
+    "setup": "./setup.sh",
+    "build:ios": "./iosdev.sh build",
+    "build:android": "./android.sh build",
+    "build:all": "./release.sh all",
+    "dev:ios": "./iosdev.sh dev",
+    "dev:android": "./android.sh dev",
+    "dev:all": "./build.sh dev"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
@@ -43,8 +53,12 @@
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@types/react": "~19.0.10",
+    "concurrently": "^9.2.1",
+    "cors": "^2.8.5",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~9.2.0",
+    "express": "^5.1.0",
+    "http-proxy-middleware": "^3.0.5",
     "typescript": "~5.8.3"
   },
   "private": true

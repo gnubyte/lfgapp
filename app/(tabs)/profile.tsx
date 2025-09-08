@@ -12,7 +12,7 @@ export default function ProfileScreen() {
   const handleLogout = async () => {
     try {
       await logout();
-      router.replace('/login');
+      // Navigation is handled by AuthContext
     } catch (error) {
       console.error('Logout error:', error);
     }

@@ -41,6 +41,7 @@ This React Native app includes a complete authentication system that integrates 
 The app integrates with the following LFG API endpoints:
 
 - `POST /api/auth/login` - User authentication
+- `POST /api/auth/register` - User registration
 - `GET /api/auth/me` - Get current user profile
 - `POST /api/auth/refresh` - Refresh access token
 
@@ -50,6 +51,18 @@ The app integrates with the following LFG API endpoints:
 ```typescript
 const { login } = useAuth();
 const success = await login(username, password);
+```
+
+### Register
+```typescript
+const { register } = useAuth();
+const success = await register({
+  username: 'gamer123',
+  email: 'gamer@example.com',
+  password: 'password123',
+  first_name: 'John',
+  last_name: 'Doe'
+});
 ```
 
 ### Logout
@@ -81,6 +94,7 @@ services/
 
 app/
 ├── login.tsx               # Login screen
+├── register.tsx            # Registration screen
 ├── (tabs)/
 │   ├── dashboard.tsx       # Authenticated dashboard
 │   ├── profile.tsx         # User profile with logout
