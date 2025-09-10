@@ -4,7 +4,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { apiService, ChatRoom } from '@/services/api';
 import { ThemedText } from './ThemedText';
 import { ThemedView } from './ThemedView';
+import { ThemedCard } from './ThemedCard';
 import { IconSymbol } from './ui/IconSymbol';
+import { Colors } from '@/constants/Colors';
 
 interface ChatRoomListProps {
   onChatRoomSelect: (chatRoom: ChatRoom) => void;
@@ -118,7 +120,7 @@ export function ChatRoomList({ onChatRoomSelect, refreshTrigger }: ChatRoomListP
           <IconSymbol 
             name={getChatRoomIcon(chatRoom)} 
             size={24} 
-            color="#007AFF" 
+            color={Colors.primary.purple} 
           />
         </View>
         
@@ -150,7 +152,7 @@ export function ChatRoomList({ onChatRoomSelect, refreshTrigger }: ChatRoomListP
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#007AFF" />
+        <ActivityIndicator size="large" color={Colors.primary.purple} />
         <ThemedText style={styles.loadingText}>Loading chat rooms...</ThemedText>
       </View>
     );
@@ -159,7 +161,7 @@ export function ChatRoomList({ onChatRoomSelect, refreshTrigger }: ChatRoomListP
   if (error) {
     return (
       <View style={styles.errorContainer}>
-        <IconSymbol name="exclamationmark.triangle" size={48} color="#FF3B30" />
+        <IconSymbol name="exclamationmark.triangle" size={48} color={Colors.primary.red} />
         <ThemedText style={styles.errorText}>{error}</ThemedText>
         <TouchableOpacity style={styles.retryButton} onPress={loadChatRooms}>
           <ThemedText style={styles.retryButtonText}>Retry</ThemedText>
@@ -171,7 +173,7 @@ export function ChatRoomList({ onChatRoomSelect, refreshTrigger }: ChatRoomListP
   if (chatRooms.length === 0) {
     return (
       <View style={styles.emptyContainer}>
-        <IconSymbol name="bubble.left.and.bubble.right" size={64} color="#8E8E93" />
+        <IconSymbol name="bubble.left.and.bubble.right" size={64} color={Colors.dark.text.muted} />
         <ThemedText style={styles.emptyTitle}>No Chat Rooms</ThemedText>
         <ThemedText style={styles.emptySubtitle}>
           Start a conversation by creating a new chat room
@@ -196,13 +198,14 @@ export function ChatRoomList({ onChatRoomSelect, refreshTrigger }: ChatRoomListP
 const styles = StyleSheet.create({
   chatRoomList: {
     flex: 1,
+    backgroundColor: Colors.dark.background,
   },
   chatRoomItem: {
     backgroundColor: 'transparent',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E5E5EA',
+    borderBottomColor: Colors.dark.border,
   },
   chatRoomContent: {
     flexDirection: 'row',
@@ -212,7 +215,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#F2F2F7',
+    backgroundColor: Colors.dark.surface,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -234,7 +237,7 @@ const styles = StyleSheet.create({
   },
   chatRoomTime: {
     fontSize: 12,
-    color: '#8E8E93',
+    color: Colors.dark.text.muted,
   },
   chatRoomMeta: {
     flexDirection: 'row',
@@ -243,10 +246,10 @@ const styles = StyleSheet.create({
   },
   participantCount: {
     fontSize: 14,
-    color: '#8E8E93',
+    color: Colors.dark.text.muted,
   },
   groupBadge: {
-    backgroundColor: '#007AFF',
+    backgroundColor: Colors.primary.purple,
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 10,
@@ -265,7 +268,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#8E8E93',
+    color: Colors.dark.text.muted,
   },
   errorContainer: {
     flex: 1,
@@ -277,11 +280,11 @@ const styles = StyleSheet.create({
     marginTop: 12,
     marginBottom: 20,
     fontSize: 16,
-    color: '#FF3B30',
+    color: Colors.primary.red,
     textAlign: 'center',
   },
   retryButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: Colors.primary.purple,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
@@ -305,7 +308,7 @@ const styles = StyleSheet.create({
   },
   emptySubtitle: {
     fontSize: 16,
-    color: '#8E8E93',
+    color: Colors.dark.text.muted,
     textAlign: 'center',
     lineHeight: 22,
   },

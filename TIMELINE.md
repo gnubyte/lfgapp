@@ -58,7 +58,7 @@ interface TimelinePostProps {
 ```
 
 ### Timeline Screen
-Located in `app/(tabs)/index.tsx`
+Located in `app/(tabs)/timeline.tsx`
 
 **Features:**
 - FlatList for efficient scrolling

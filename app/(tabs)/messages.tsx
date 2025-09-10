@@ -5,12 +5,14 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { ThemedCard } from '@/components/ThemedCard';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { ChatRoomList } from '@/components/ChatRoomList';
 import { MessageList, MessageListRef } from '@/components/MessageList';
 import { MessageInput } from '@/components/MessageInput';
 import { NewChatModal } from '@/components/NewChatModal';
 import { ChatRoom, Message } from '@/services/api';
+import { Colors } from '@/constants/Colors';
 
 export default function MessagesScreen() {
   // Use safe area insets with fallback - handle the hook error
@@ -63,13 +65,13 @@ export default function MessagesScreen() {
     return (
       <ThemedView style={styles.container}>
         {/* Chat Header */}
-        <View style={[styles.chatHeader, { paddingTop: insets.top + 12 }]}>
+        <ThemedCard variant="compact" style={StyleSheet.flatten([styles.chatHeader, { paddingTop: insets.top + 12 }])}>
           <TouchableOpacity 
             style={styles.backButton}
             onPress={handleBackToInbox}
             activeOpacity={0.7}
           >
-            <IconSymbol name="chevron.left" size={24} color="#007AFF" />
+            <IconSymbol name="chevron.left" size={24} color={Colors.primary.purple} />
           </TouchableOpacity>
           
           <View style={styles.chatHeaderInfo}>
@@ -86,9 +88,9 @@ export default function MessagesScreen() {
             onPress={() => Alert.alert('More Options', 'Chat options coming soon')}
             activeOpacity={0.7}
           >
-            <IconSymbol name="ellipsis" size={24} color="#8E8E93" />
+            <IconSymbol name="ellipsis" size={24} color={Colors.dark.text.muted} />
           </TouchableOpacity>
-        </View>
+        </ThemedCard>
 
         {/* Messages */}
         <MessageList 
@@ -109,16 +111,24 @@ export default function MessagesScreen() {
   return (
     <ThemedView style={styles.container}>
       {/* Inbox Header */}
-      <View style={[styles.inboxHeader, { paddingTop: insets.top + 12 }]}>
-        <ThemedText type="title" style={styles.inboxTitle}>Messages</ThemedText>
+      <ThemedCard variant="compact" style={StyleSheet.flatten([styles.inboxHeader, { paddingTop: insets.top + 12 }])}>
+        <View style={styles.headerContent}>
+          <IconSymbol name="bubble.left.and.bubble.right.fill" size={24} color={Colors.features.messages} />
+          <View style={styles.headerText}>
+            <ThemedText style={styles.inboxTitle}>Messages</ThemedText>
+            <ThemedText style={styles.inboxSubtitle}>
+              Connect with your gaming community
+            </ThemedText>
+          </View>
+        </View>
         <TouchableOpacity 
           style={styles.newChatButton}
           onPress={() => setShowNewChatModal(true)}
           activeOpacity={0.7}
         >
-          <IconSymbol name="plus" size={24} color="#007AFF" />
+          <IconSymbol name="plus" size={24} color={Colors.primary.purple} />
         </TouchableOpacity>
-      </View>
+      </ThemedCard>
 
       {/* Chat Room List */}
       <ChatRoomList 
@@ -139,46 +149,64 @@ export default function MessagesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'transparent',
+    backgroundColor: Colors.dark.background,
   },
   inboxHeader: {
+    marginHorizontal: 0,
+    marginVertical: 0,
+    marginTop: 60,
+    marginBottom: 8,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingBottom: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E5E5EA',
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  headerText: {
+    marginLeft: 12,
+    flex: 1,
   },
   inboxTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
+    fontSize: 24,
+    fontWeight: '700',
+    color: Colors.dark.text.primary,
+  },
+  inboxSubtitle: {
+    fontSize: 14,
+    color: Colors.dark.text.secondary,
+    marginTop: 4,
   },
   newChatButton: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#F2F2F7',
+    backgroundColor: Colors.dark.surface,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: Colors.dark.border,
   },
   chatHeader: {
+    marginHorizontal: 0,
+    marginVertical: 0,
+    marginTop: 60,
+    marginBottom: 8,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingBottom: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E5E5EA',
-    backgroundColor: 'transparent',
   },
   backButton: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#F2F2F7',
+    backgroundColor: Colors.dark.surface,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
+    borderWidth: 1,
+    borderColor: Colors.dark.border,
   },
   chatHeaderInfo: {
     flex: 1,
@@ -187,18 +215,21 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     marginBottom: 2,
+    color: Colors.dark.text.primary,
   },
   chatSubtitle: {
     fontSize: 14,
-    color: '#8E8E93',
+    color: Colors.dark.text.secondary,
   },
   moreButton: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#F2F2F7',
+    backgroundColor: Colors.dark.surface,
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 12,
+    borderWidth: 1,
+    borderColor: Colors.dark.border,
   },
 });

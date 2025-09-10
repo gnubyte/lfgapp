@@ -98,7 +98,7 @@ app/
 ├── (tabs)/
 │   ├── dashboard.tsx       # Authenticated dashboard
 │   ├── profile.tsx         # User profile with logout
-│   └── index.tsx           # Home screen with user info
+│   └── timeline.tsx        # Timeline screen with user info
 └── _layout.tsx             # Root layout with auth routing
 ```
 

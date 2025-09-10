@@ -9,8 +9,8 @@ app/
 ├── _layout.tsx          # Root layout with Stack navigator
 ├── (tabs)/              # Tab group (parentheses make it a group, not a route)
 │   ├── _layout.tsx      # Tab navigator layout
-│   ├── index.tsx        # Home tab (/)
-│   ├── explore.tsx      # Explore tab (/explore)
+│   ├── timeline.tsx     # Timeline tab (/)
+│   ├── messages.tsx     # Messages tab (/messages)
 │   └── profile.tsx      # Profile tab (/profile)
 ├── settings.tsx         # Settings screen (/settings)
 ├── modal.tsx            # Modal screen (/modal)
@@ -21,7 +21,7 @@ app/
 
 ### 1. Tab Navigation
 - **Location**: `app/(tabs)/_layout.tsx`
-- **Screens**: Home, Explore, Profile
+- **Screens**: Timeline, Messages, Profile
 - **Usage**: Automatically handled by tab bar
 
 ### 2. Stack Navigation
@@ -85,8 +85,8 @@ router.push({
 
 ## Examples in This App
 
-- **Home** (`/`): Main screen with navigation examples
-- **Explore** (`/explore`): Information screen with navigation buttons
+- **Timeline** (`/`): Main screen with timeline functionality
+- **Messages** (`/messages`): Messages screen with chat functionality
 - **Profile** (`/profile`): User profile with navigation examples
 - **Settings** (`/settings`): Settings screen with back navigation
 - **Modal** (`/modal`): Modal presentation example

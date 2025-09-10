@@ -240,7 +240,7 @@ app/_layout.tsx → app/login.tsx
 
 #### **If User IS Authenticated:**
 ```
-app/_layout.tsx → app/(tabs)/_layout.tsx → app/(tabs)/index.tsx
+app/_layout.tsx → app/(tabs)/_layout.tsx → app/(tabs)/timeline.tsx
 ```
 
 **Tab Layout** (`app/(tabs)/_layout.tsx`):
@@ -248,16 +248,16 @@ app/_layout.tsx → app/(tabs)/_layout.tsx → app/(tabs)/index.tsx
 export default function TabLayout() {
   return (
     <Tabs>
-      <Tabs.Screen name="index" />      // Timeline
-      <Tabs.Screen name="dashboard" />  // Dashboard  
-      <Tabs.Screen name="explore" />    // Explore
+      <Tabs.Screen name="timeline" />  // Timeline
+      <Tabs.Screen name="dashboard" /> // Dashboard  
+      <Tabs.Screen name="messages" />  // Messages
       <Tabs.Screen name="profile" />    // Profile
     </Tabs>
   );
 }
 ```
 
-**Default Tab** (`app/(tabs)/index.tsx`):
+**Default Tab** (`app/(tabs)/timeline.tsx`):
 ```typescript
 export default function TimelineScreen() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
@@ -301,7 +301,7 @@ Authentication Check
 │   ↓                              │   ↓
 │   app/(tabs)/_layout.tsx         │   Load Timeline Data
 │   ↓                              │   ↓
-│   app/(tabs)/index.tsx           │   Render Timeline
+│   app/(tabs)/timeline.tsx        │   Render Timeline
 │   (Timeline Screen)              │
 └─────────────────┴─────────────────┘
 ```
@@ -323,7 +323,7 @@ Authentication Check
 5. **Either:**
    - **`app/login.tsx`** - If not authenticated
    - **`app/(tabs)/_layout.tsx`** - If authenticated
-6. **`app/(tabs)/index.tsx`** - Default tab (Timeline)
+6. **`app/(tabs)/timeline.tsx`** - Default tab (Timeline)
 
 ### 9. **Development Notes**
 
