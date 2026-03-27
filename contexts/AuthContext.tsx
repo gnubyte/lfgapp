@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState, ReactNode, useCa
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { apiService } from '@/services/api';
+import { timelineCache } from '@/services/timelineCache';
 
 interface User {
   id: number;
@@ -92,7 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    let timeoutId: NodeJS.Timeout | null = null;
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
     try {
       authLoadAttempted = true;
@@ -215,6 +216,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       debugSetIsLoading(true);
       console.log('🔄 Attempting login...');
+      
+      // Check if we're logging in as a different user
+      const isDifferentUser = user && user.username !== username;
+      
+      if (isDifferentUser) {
+        // Clear timeline cache only when switching to a different user
+        timelineCache.clear();
+        console.log('🧹 Timeline cache cleared - different user detected:', user.username, '->', username);
+      } else if (!user) {
+        // Clear cache if no current user (first login)
+        timelineCache.clear();
+        console.log('🧹 Timeline cache cleared - first login');
+      } else {
+        console.log('✅ Same user logging in again, preserving cache:', username);
+      }
+      
       const response = await apiService.login(username, password);
       
       if (response) {
@@ -285,6 +302,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const register = async (userData: RegisterData): Promise<boolean> => {
     try {
       debugSetIsLoading(true);
+      
+      // Check if we're registering as a different user
+      const isDifferentUser = user && user.username !== userData.username;
+      
+      if (isDifferentUser) {
+        // Clear timeline cache only when switching to a different user
+        timelineCache.clear();
+        console.log('🧹 Timeline cache cleared - different user detected during registration:', user.username, '->', userData.username);
+      } else if (!user) {
+        // Clear cache if no current user (first registration)
+        timelineCache.clear();
+        console.log('🧹 Timeline cache cleared - first registration');
+      } else {
+        console.log('✅ Same user registering again, preserving cache:', userData.username);
+      }
+      
       const response = await apiService.register(userData);
       
       if (response) {
@@ -351,6 +384,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const clearAuth = async (): Promise<void> => {
     try {
       console.log(`🧹 [${new Date().toISOString()}] Clearing authentication data...`);
+      
+      // Clear timeline cache when clearing auth
+      timelineCache.clear();
+      console.log(`🧹 [${new Date().toISOString()}] Timeline cache cleared`);
+      
       await Promise.all([
         AsyncStorage.removeItem(TOKEN_KEY),
         AsyncStorage.removeItem(USER_KEY)

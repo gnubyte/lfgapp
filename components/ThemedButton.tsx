@@ -23,44 +23,24 @@ export function ThemedButton({
   textStyle,
   icon,
 }: ThemedButtonProps) {
-  const getButtonStyle = () => {
-    const baseStyle = [styles.button];
+  const getButtonStyle = (): ViewStyle[] => {
+    const baseStyle: ViewStyle[] = [styles.button];
     
-    // Variant styles
     switch (variant) {
-      case 'primary':
-        baseStyle.push(styles.buttonPrimary);
-        break;
-      case 'secondary':
-        baseStyle.push(styles.buttonSecondary);
-        break;
-      case 'tertiary':
-        baseStyle.push(styles.buttonTertiary);
-        break;
-      case 'warning':
-        baseStyle.push(styles.buttonWarning);
-        break;
-      case 'danger':
-        baseStyle.push(styles.buttonDanger);
-        break;
-      case 'outline':
-        baseStyle.push(styles.buttonOutline);
-        break;
+      case 'primary':   baseStyle.push(styles.buttonPrimary); break;
+      case 'secondary': baseStyle.push(styles.buttonSecondary); break;
+      case 'tertiary':  baseStyle.push(styles.buttonTertiary); break;
+      case 'warning':   baseStyle.push(styles.buttonWarning); break;
+      case 'danger':    baseStyle.push(styles.buttonDanger); break;
+      case 'outline':   baseStyle.push(styles.buttonOutline); break;
     }
 
-    // Size styles
     switch (size) {
-      case 'small':
-        baseStyle.push(styles.buttonSmall);
-        break;
-      case 'large':
-        baseStyle.push(styles.buttonLarge);
-        break;
-      default:
-        baseStyle.push(styles.buttonMedium);
+      case 'small': baseStyle.push(styles.buttonSmall); break;
+      case 'large': baseStyle.push(styles.buttonLarge); break;
+      default:      baseStyle.push(styles.buttonMedium);
     }
 
-    // Disabled style
     if (disabled) {
       baseStyle.push(styles.buttonDisabled);
     }
@@ -68,18 +48,11 @@ export function ThemedButton({
     return baseStyle;
   };
 
-  const getTextStyle = () => {
-    const baseTextStyle = [styles.buttonText];
-    
-    if (variant === 'outline') {
-      baseTextStyle.push(styles.buttonTextOutline);
-    }
-    
-    if (disabled) {
-      baseTextStyle.push(styles.buttonTextDisabled);
-    }
-
-    return baseTextStyle;
+  const getTextStyle = (): TextStyle[] => {
+    const base: TextStyle[] = [styles.buttonText];
+    if (variant === 'outline') base.push(styles.buttonTextOutline);
+    if (disabled) base.push(styles.buttonTextDisabled);
+    return base;
   };
 
   return (

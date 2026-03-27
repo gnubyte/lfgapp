@@ -40,21 +40,21 @@ export default function DashboardScreen() {
       description: 'Browse available gaming groups',
       icon: 'magnifyingglass',
       color: 'groups' as const,
-      onPress: () => router.push('/groups'),
+      onPress: () => router.push('/groups' as any),
     },
     {
       title: 'Create Group',
       description: 'Start your own gaming group',
       icon: 'plus.circle',
       color: 'events' as const,
-      onPress: () => router.push('/create-group'),
+      onPress: () => router.push('/create-group' as any),
     },
     {
       title: 'My Calendar',
       description: 'View your upcoming events',
       icon: 'calendar',
       color: 'calendar' as const,
-      onPress: () => router.push('/calendar'),
+      onPress: () => router.push('/calendar' as any),
     },
     {
       title: 'Messages',
@@ -138,7 +138,7 @@ export default function DashboardScreen() {
 
           <ThemedButton
             title="My Groups"
-            onPress={() => router.push('/my-groups')}
+            onPress={() => router.push('/my-groups' as any)}
             variant="primary"
             size="small"
             style={styles.activityButton}
